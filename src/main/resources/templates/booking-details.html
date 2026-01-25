@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/bookings/search}">New Booking</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="details-container">
+                <div th:if="${success}" class="alert alert-success">
+                    <span th:text="${success}"></span>
+                </div>
+                
+                <h2>Booking Details</h2>
+                
+                <div class="details-card">
+                    <div class="detail-row">
+                        <span class="label">Booking ID:</span>
+                        <span class="value" th:text="${booking.bookingId}"></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span class="badge" th:classappend="${booking.status.name() == 'CONFIRMED' ? 'badge-success' : (booking.status.name() == 'PENDING_PAYMENT' ? 'badge-warning' : 'badge-error')}" 
+                              th:text="${booking.status}"></span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h3>Room Information</h3>
+                    <div class="detail-row">
+                        <span class="label">Room Number:</span>
+                        <span class="value" th:text="${booking.roomNumber}"></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Room Type:</span>
+                        <span class="value" th:text="${booking.roomType}"></span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h3>Stay Details</h3>
+                    <div class="detail-row">
+                        <span class="label">Check-in Date:</span>
+                        <span class="value" th:text="${booking.checkInDate}"></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Check-out Date:</span>
+                        <span class="value" th:text="${booking.checkOutDate}"></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Number of Guests:</span>
+                        <span class="value" th:text="${booking.numberOfGuests}"></span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h3>Customer Information</h3>
+                    <div class="detail-row">
+                        <span class="label">Name:</span>
+                        <span class="value" th:text="${booking.customerName}"></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Email:</span>
+                        <span class="value" th:text="${booking.customerEmail}"></span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="detail-row total">
+                        <span class="label">Total Amount:</span>
+                        <span class="value">$<span th:text="${booking.totalAmount}"></span></span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="label">Created At:</span>
+                        <span class="value" th:text="${#temporals.format(booking.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a th:if="${booking.status.name() == 'PENDING_PAYMENT'}" 
+                       th:href="@{/payments/process(bookingId=${booking.bookingId})}" 
+                       class="btn btn-primary">
+                        💳 Proceed to Payment
+                    </a>
+                    <a th:href="@{/}" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

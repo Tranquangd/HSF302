@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Rooms - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/bookings/search}">New Search</a>
+            </nav>
+        </header>
+        
+        <main>
+            <h2>Available Rooms</h2>
+            
+            <div class="search-summary">
+                <p><strong>Check-in:</strong> <span th:text="${searchRequest.checkInDate}"></span></p>
+                <p><strong>Check-out:</strong> <span th:text="${searchRequest.checkOutDate}"></span></p>
+                <p><strong>Guests:</strong> <span th:text="${searchRequest.numberOfGuests}"></span></p>
+            </div>
+            
+            <div class="room-grid" th:if="${rooms != null and !rooms.isEmpty()}">
+                <div class="room-card" th:each="room : ${rooms}">
+                    <div class="room-image">
+                        <img th:if="${room.imageUrl != null and !room.imageUrl.isEmpty()}"
+                             th:src="@{${room.imageUrl}}"
+                             th:alt="'Room ' + ${room.roomNumber}"
+                             class="room-img">
+                        <div th:if="${room.imageUrl == null or room.imageUrl.isEmpty()}" class="room-image-placeholder">
+                            <span class="room-icon">🏨</span>
+                        </div>
+                    </div>
+                    <div class="room-header">
+                        <h3 th:text="'Room ' + ${room.roomNumber}">Room 101</h3>
+                        <span class="room-type" th:text="${room.roomType}">Single</span>
+                    </div>
+                    
+                    <div class="room-details">
+                        <p><strong>Capacity:</strong> <span th:text="${room.capacity} + ' guests'"></span></p>
+                        <p><strong>Price per night:</strong> $<span th:text="${room.pricePerNight}"></span></p>
+                        <p><strong>Number of nights:</strong> <span th:text="${room.numberOfNights}"></span></p>
+                        <p class="room-description" th:text="${room.description}"></p>
+                    </div>
+                    
+                    <div class="room-footer">
+                        <div class="total-price">
+                            <strong>Total: $<span th:text="${room.totalPrice}"></span></strong>
+                        </div>
+                        <a th:href="@{/bookings/create(roomId=${room.roomId},checkInDate=${searchRequest.checkInDate},checkOutDate=${searchRequest.checkOutDate},numberOfGuests=${searchRequest.numberOfGuests})}" 
+                           class="btn btn-primary">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${rooms == null or rooms.isEmpty()}" class="alert alert-info">
+                <p>No rooms available for the selected dates and criteria.</p>
+                <a th:href="@{/bookings/search}" class="btn btn-primary">Try Another Search</a>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

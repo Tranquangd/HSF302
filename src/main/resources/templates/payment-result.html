@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="success-container">
+                <div th:if="${success}" class="alert alert-success">
+                    <span th:text="${success}"></span>
+                </div>
+                
+                <div class="success-icon">✅</div>
+                <h2>Payment Successful!</h2>
+                <p>Your booking has been confirmed.</p>
+                
+                <div class="success-details">
+                    <p><strong>Payment ID:</strong> <span th:text="${paymentId}"></span></p>
+                    <p>A confirmation email has been sent to your registered email address.</p>
+                </div>
+                
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
+                    <a th:href="@{/bookings/search}" class="btn btn-secondary">Make Another Booking</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>
