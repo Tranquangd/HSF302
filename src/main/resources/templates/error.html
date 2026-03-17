@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-inner">
+                <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+                <nav>
+                    <a th:href="@{/}" class="active">Trang chủ</a>
+                </nav>
+                <div class="header-auth"></div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="error-container">
+                <div class="error-icon">❌</div>
+                <h2>Oops! Something went wrong</h2>
+                
+                <div class="alert alert-error" th:if="${error}">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div class="alert alert-error" th:unless="${error}">
+                    <span>An unexpected error occurred. Please try again later.</span>
+                </div>
+                
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
+                    <a th:href="@{/bookings/search}" class="btn btn-secondary">Search Rooms</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

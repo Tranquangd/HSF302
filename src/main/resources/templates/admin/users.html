@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('users')}"></aside>
+
+        <!-- Main Content - Only Admin can access -->
+        <main class="main-content" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>👥 User Management</h1>
+                <a href="/admin/users/create" class="btn btn-primary">➕ Create User</a>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success"><span th:text="${success}"></span></div>
+            <div th:if="${error}" class="alert alert-error"><span th:text="${error}"></span></div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.userId}">admin</td>
+                            <td><strong th:text="${user.username}">Administrator</strong></td>
+                            <td>
+                                <span class="role-badge" th:classappend="${user.role == 'admin' ? 'role-admin' : (user.role == 'manager' ? 'role-manager' : 'role-staff')}" th:text="${user.role}">admin</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:classappend="${user.status == 'active' ? 'status-active' : 'status-inactive'}" th:text="${user.status}">active</span>
+                            </td>
+                            <td th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd') : 'N/A'}">2026-01-01</td>
+                            <td class="action-btns">
+                                <button class="action-btn status" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}"
+                                        th:attr="data-id=${user.userId},data-status=${user.status}"
+                                        onclick="openStatusModal(this.getAttribute('data-id'), this.getAttribute('data-status'))">Status</button>
+                                <button class="action-btn delete" th:if="${session.role != null && session.role.equalsIgnoreCase('admin') && user.role != 'admin'}"
+                                        th:attr="data-id=${user.userId}"
+                                        onclick="deleteUser(this.getAttribute('data-id'))">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Show access denied message for non-Admin roles -->
+        <main class="main-content" th:if="${session.role == null or !session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to access User Management.</p>
+                <p>Only <strong>Admin</strong> can access this section.</p>
+            </div>
+            <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </main>
+    </div>
+
+    <!-- Status Modal -->
+    <div id="statusModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Update User Status</h3>
+            <form id="statusForm" method="post">
+                <div class="form-group">
+                    <label>Select Status:</label>
+                    <select id="newStatus" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openStatusModal(userId, currentStatus) {
+            document.getElementById('statusModal').style.display = 'flex';
+            document.getElementById('statusForm').action = '/admin/users/' + userId + '/status';
+            document.getElementById('newStatus').value = currentStatus;
+        }
+        function closeModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                fetch('/admin/users/' + userId + '/delete', { method: 'POST' }).then(() => location.reload());
+            }
+        }
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('statusModal')) closeModal();
+        }
+    </script>
+</body>
+</html>
+

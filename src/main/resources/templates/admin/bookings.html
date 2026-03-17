@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Management - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        #statusModal .modal-content { min-width: 380px; padding: 5px; }
+        #statusModal .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        #statusModal .modal-actions .btn { min-width: 110px; }
+        .data-table { overflow-x: auto; }
+        .data-table table { width: 100%; }
+        
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('bookings')}"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📅 Booking Management</h1>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <form action="/admin/bookings" method="get" class="filter-form">
+                    <select name="status">
+                        <option value="">All Status</option>
+                        <option value="PENDING_PAYMENT" th:selected="${param.status != null && param.status[0] == 'PENDING_PAYMENT'}">Pending Payment</option>
+                        <option value="CONFIRMED" th:selected="${param.status != null && param.status[0] == 'CONFIRMED'}">Confirmed</option>
+                        <option value="CANCELLED" th:selected="${param.status != null && param.status[0] == 'CANCELLED'}">Cancelled</option>
+                        <option value="COMPLETED" th:selected="${param.status != null && param.status[0] == 'COMPLETED'}">Completed</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Filter</button>
+                </form>
+            </div>
+
+            <!-- Bookings Table -->
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Room</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Guests</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${bookings}">
+                            <td th:text="${booking.id}">#1</td>
+                            <td>
+                                <strong th:text="${booking.customer.fullName}">John Doe</strong><br>
+                                <small th:text="${booking.customer.email}">john@email.com</small>
+                            </td>
+                            <td>
+                                <strong th:text="${booking.room.roomNumber}">101</strong><br>
+                                <small th:text="${booking.room.roomType}">Standard</small>
+                            </td>
+                            <td th:text="${booking.checkInDate}">2026-01-01</td>
+                            <td th:text="${booking.checkOutDate}">2026-01-03</td>
+                            <td th:text="${booking.numberOfGuests}">2</td>
+                            <td th:text="'$' + ${booking.totalAmount}">$200</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${booking.status.name() == 'CONFIRMED' || booking.status.name() == 'COMPLETED' ? 'status-confirmed' : (booking.status.name() == 'PENDING_PAYMENT' ? 'status-pending' : 'status-cancelled')}"
+                                      th:text="${booking.status}">CONFIRMED</span>
+                            </td>
+                            <td class="action-btns">
+                                <a th:href="@{/admin/bookings/{id}(id=${booking.id})}" class="action-btn view">View</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(bookings)}">
+                            <td colspan="9" style="text-align: center; padding: 40px;">No bookings found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
+

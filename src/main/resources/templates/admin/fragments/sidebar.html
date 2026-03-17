@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Admin Sidebar Fragment -->
+    <aside class="sidebar" th:fragment="sidebar(activeMenu)">
+        <div class="sidebar-header">
+            <h2>🏨 Hotel Admin</h2>
+            <p th:text="${session.username != null ? session.username : 'Guest'}">Admin</p>
+            <small th:if="${session.role != null}" th:text="'Role: ' + ${session.role.toUpperCase()}" style="color: #aaa; font-size: 12px;"></small>
+        </div>
+        <ul class="sidebar-menu">
+            <!-- Dashboard - All authorized roles can view (Admin, Manager, Staff) -->
+            <li th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager') or session.role.equalsIgnoreCase('staff'))}">
+                <a href="/admin/dashboard" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}"><span class="icon">📊</span> Dashboard</a>
+            </li>
+
+            <!-- Bookings - All authorized roles can view (Admin, Manager, Staff) -->
+            <li th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager') or session.role.equalsIgnoreCase('staff'))}">
+                <a href="/admin/bookings" th:classappend="${activeMenu == 'bookings' ? 'active' : ''}"><span class="icon">📅</span> Bookings</a>
+            </li>
+
+            <!-- Rooms - All authorized roles can view (Admin, Manager, Staff) -->
+            <li th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager') or session.role.equalsIgnoreCase('staff'))}">
+                <a href="/admin/rooms" th:classappend="${activeMenu == 'rooms' ? 'active' : ''}"><span class="icon">🛏️</span> Rooms</a>
+            </li>
+
+            <!-- Users menu - Only visible to Admin -->
+            <li th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+                <a href="/admin/users" th:classappend="${activeMenu == 'users' ? 'active' : ''}"><span class="icon">👥</span> Users</a>
+            </li>
+
+            <!-- Customers - Admin and Manager only -->
+            <li th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+                <a href="/admin/customers" th:classappend="${activeMenu == 'customers' ? 'active' : ''}"><span class="icon">👤</span> Customers</a>
+            </li>
+
+            <!-- Payments - Only visible to Admin -->
+            <li th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+                <a href="/admin/payments" th:classappend="${activeMenu == 'payments' ? 'active' : ''}"><span class="icon">💳</span> Payments</a>
+            </li>
+
+            <li><a href="/"><span class="icon">🏠</span> Back to Site</a></li>
+            <li><a href="/logout"><span class="icon">🚪</span> Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Role Permission Helper Fragment -->
+    <th:block th:fragment="roleCheck">
+        <!--
+        ╔════════════════════════════════════════════════════════════════════════════╗
+        ║                         ROLE PERMISSION MATRIX                             ║
+        ╠════════════════════════════════════════════════════════════════════════════╣
+        ║ ADMIN:                                                                     ║
+        ║   - Full access to everything                                              ║
+        ║   - Manage Users (CRUD - Create, Read, Update, Delete)                     ║
+        ║   - Manage Rooms (CRUD - Create, Read, Update, Delete)                     ║
+        ║   - Manage Bookings (CRUD - Create, Read, Update, Delete, Status Change)  ║
+        ║   - Manage Customers (CRUD - Create, Read, Update, Delete, Status Change) ║
+        ╠════════════════════════════════════════════════════════════════════════════╣
+        ║ MANAGER:                                                                   ║
+        ║   - View Dashboard                                                         ║
+        ║   - Manage Bookings (Create, Read, Update, Status Change - NO Delete)     ║
+        ║   - View Rooms (Read only - NO Create, Edit, Delete)                       ║
+        ║   - Manage Customers (Read, Edit, Status Change - NO Delete)              ║
+        ║   - NO access to Users menu                                                ║
+        ╠════════════════════════════════════════════════════════════════════════════╣
+        ║ STAFF:                                                                     ║
+        ║   - Read-only access to Dashboard, Bookings, Rooms                        ║
+        ║   - NO access to Customers                                                ║
+        ║   - NO access to Users menu                                               ║
+        ╚════════════════════════════════════════════════════════════════════════════╝
+
+        USAGE IN TEMPLATES:
+        ====================
+        For Admin only:
+            th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}"
+
+        For Admin or Manager:
+            th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}"
+
+        For All authorized roles (Admin, Manager, Staff):
+            (No condition needed - all can view)
+
+        HIDE from Staff (show only to Admin/Manager):
+            th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}"
+        -->
+    </th:block>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Management - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('payments')}"></aside>
+
+        <!-- Main Content - Only Admin can access -->
+        <main class="main-content" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>💳 Payment Management</h1>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Payment Statistics -->
+            <div class="stats-grid" style="margin-bottom: 20px;">
+                <div class="stat-card">
+                    <div class="stat-icon blue">💳</div>
+                    <div class="stat-info">
+                        <h3 th:text="${totalPayments != null ? totalPayments : 0}">0</h3>
+                        <p>Total Payments</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info">
+                        <h3 th:text="${successCount != null ? successCount : 0}">0</h3>
+                        <p>Successful</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">⏳</div>
+                    <div class="stat-info">
+                        <h3 th:text="${pendingCount != null ? pendingCount : 0}">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">❌</div>
+                    <div class="stat-info">
+                        <h3 th:text="${failedCount != null ? failedCount : 0}">0</h3>
+                        <p>Failed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>All Payments</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Booking ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Transaction ID</th>
+                            <th>Payment Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${payment.id}">#1</td>
+                            <td>
+                                <a th:href="@{/admin/bookings/{id}(id=${payment.booking.id})}" th:text="'#' + ${payment.booking.id}">#1</a>
+                            </td>
+                            <td th:text="${payment.booking.customer != null ? payment.booking.customer.fullName : 'N/A'}">John Doe</td>
+                            <td>
+                                <span th:text="${#numbers.formatDecimal(payment.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,000,000 VND</span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${payment.paymentMethod.name() == 'CASH' ? 'badge-warning' : 'badge-secondary'}"
+                                      th:text="${payment.paymentMethod}">CASH</span>
+                            </td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${payment.status.name() == 'SUCCESS' ? 'status-confirmed' : (payment.status.name() == 'PENDING' ? 'status-pending' : 'status-cancelled')}"
+                                      th:text="${payment.status}">SUCCESS</span>
+                            </td>
+                            <td>
+                                <span th:if="${payment.transactionId != null}" th:text="${#strings.abbreviate(payment.transactionId, 20)}">TXN123...</span>
+                                <span th:unless="${payment.transactionId != null}" class="text-muted">-</span>
+                            </td>
+                            <td th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">01/01/2026</td>
+                            <td class="action-btns">
+                                <a th:href="@{/admin/payments/{id}(id=${payment.id})}" class="action-btn view">View</a>
+                                <!-- Refund button: only for SUCCESS payments -->
+                                <form th:if="${payment.status == T(com.example.hotelbooking.enums.PaymentStatus).SUCCESS}"
+                                      th:action="@{/admin/payments/refund/{id}(id=${payment.booking.id})}" method="post" style="display:inline;"
+                                      onsubmit="return confirm('Bạn có chắc muốn hoàn tiền cho payment này?');">
+                                    <button type="submit" class="action-btn edit" style="background:#e67e22;color:white;">💰 Refund</button>
+                                </form>
+                                <!-- Show message if payment is already refunded -->
+                                <span th:if="${payment.status == T(com.example.hotelbooking.enums.PaymentStatus).REFUNDED}" 
+                                      class="text-muted" style="font-size:12px;color:#6c757d;">Đã hoàn tiền</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(payments)}">
+                            <td colspan="9" style="text-align: center; padding: 40px;">No payments found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Show access denied message for non-Admin roles -->
+        <main class="main-content" th:if="${session.role == null or !session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to access Payment Management.</p>
+                <p>Only <strong>Admin</strong> can access this section.</p>
+            </div>
+            <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </main>
+    </div>
+
+    <style>
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .badge-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+        .stat-card .stat-icon.red {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+    </style>
+</body>
+</html>

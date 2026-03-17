@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbox - Tìm phòng trống</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/chatbox.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header>
+            <div class="header-inner">
+                <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+                <nav>
+                    <a th:href="@{/}">Trang chủ</a>
+                    <a th:href="@{/bookings/search}">🔍 Tìm phòng</a>
+                    <a th:href="@{/chat}" class="active">🤖 AI Chatbox</a>
+                    <a th:if="${session.user}" th:href="@{/bookings/my-bookings}">📋 Đặt phòng của tôi</a>
+                    <a th:if="${session.role == 'admin' or session.role == 'manager'}" th:href="@{/admin/dashboard}">📊 Quản trị</a>
+                </nav>
+                <div class="header-auth">
+                    <div th:if="${session.user}">
+                        <span class="user-name">👤 <span th:text="${session.username}"></span>
+                            <span class="badge"
+                                  th:classappend="${session.role == 'admin' ? 'badge-error' : (session.role == 'manager' ? 'badge-warning' : 'badge-success')}"
+                                  th:text="${session.role}"></span>
+                        </span>
+                    </div>
+                    <a th:if="${session.user}" th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
+                    <a th:unless="${session.user}" th:href="@{/login}" class="btn-primary-outline">Đăng nhập</a>
+                    <a th:unless="${session.user}" th:href="@{/register}" class="btn-white">Đăng ký</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== MAIN ===== -->
+        <main style="padding: 40px 20px;">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h1>🤖 AI Chatbox - Tìm phòng trống</h1>
+                    <p>Hỏi tôi về phòng trống bằng tiếng Việt hoặc tiếng Anh</p>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                Xin chào! Tôi là AI trợ lý tìm phòng. Tôi có thể giúp bạn tìm phòng trống.<br><br>
+                                <strong>Ví dụ câu hỏi:</strong><br>
+                                • "Tìm phòng từ 15/01/2025 đến 20/01/2025 cho 2 người"<br>
+                                • "Có phòng Double nào trống từ ngày mai không?"<br>
+                                • "Tôi cần phòng Suite cho 4 người từ 20/01 đến 25/01"<br><br>
+                                Hãy cho tôi biết bạn cần gì nhé!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            class="chat-input" 
+                            placeholder="Nhập câu hỏi của bạn... (ví dụ: Tìm phòng từ 15/01/2025 đến 20/01/2025 cho 2 người)"
+                            autocomplete="off"
+                        >
+                        <button id="sendButton" class="send-button">
+                            <span>Gửi</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Hotel Booking System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script th:src="@{/js/chatbox.js}"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Wallet - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="admin-container">
+    <!-- Sidebar using fragment -->
+    <aside th:replace="~{admin/fragments/sidebar :: sidebar('customers')}"></aside>
+
+    <!-- Main Content - Admin/Manager -->
+    <main class="main-content" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+        <div class="page-header">
+            <h1>💰 Customer Wallet</h1>
+            <div class="header-actions">
+                <a href="/admin/customers" class="btn btn-secondary">← Back to Customers</a>
+            </div>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success"><span th:text="${success}"></span></div>
+        <div th:if="${error}" class="alert alert-error"><span th:text="${error}"></span></div>
+
+        <section class="wallet-summary" th:if="${customer != null and wallet != null}">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2>👤 Customer Info</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Full Name</label>
+                            <span th:text="${customer.fullName}">John Doe</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <span th:text="${customer.email}">john@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Phone</label>
+                            <span th:text="${customer.phoneNumber}">0123456789</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span class="status-badge"
+                                  th:classappend="${customer.status == 'active' || customer.status == null ? 'status-active' : 'status-inactive'}"
+                                  th:text="${customer.status != null ? customer.status : 'active'}">active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2>💰 Wallet Summary</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Balance</label>
+                            <span class="amount"
+                                  th:text="${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Wallet ID</label>
+                            <span th:text="${wallet.id}">1</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Created At</label>
+                            <span th:text="${wallet.createdAt != null ? #temporals.format(wallet.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Updated At</label>
+                            <span th:text="${wallet.updatedAt != null ? #temporals.format(wallet.updatedAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</span>
+                        </div>
+                    </div>
+                    <p style="margin-top:15px; color:#666; font-size: 0.9rem;">
+                        Tất cả khoản hoàn tiền từ booking (kể cả thanh toán tiền mặt hay VNPay) sẽ được cộng vào ví này.
+                        Admin là người có quyền thực hiện hoàn tiền từ trang quản trị.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="wallet-transactions">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2>📜 Wallet Transactions</h2>
+                </div>
+                <div class="card-body">
+                    <div th:if="${transactions != null and !transactions.isEmpty()}">
+                        <div class="data-table">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Booking</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="tx : ${transactions}">
+                                    <td th:text="${tx.createdAt != null ? #temporals.format(tx.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${tx.type.name() == 'CREDIT' ? 'badge-success' : 'badge-error'}"
+                                              th:text="${tx.type}">CREDIT</span>
+                                    </td>
+                                    <td th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</td>
+                                    <td th:text="${tx.bookingId != null ? '#' + tx.bookingId : '-'}">-</td>
+                                    <td th:text="${tx.description}">Refund booking #1</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div th:if="${transactions == null or transactions.isEmpty()}" class="empty-state">
+                        <p>Chưa có giao dịch ví nào cho khách hàng này.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Access denied for other roles -->
+    <main class="main-content" th:unless="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+        <div class="page-header">
+            <h1>🚫 Access Denied</h1>
+        </div>
+        <div class="alert alert-error">
+            <p>You do not have permission to view customer wallets.</p>
+            <p>Only <strong>Admin</strong> and <strong>Manager</strong> can access this section.</p>
+        </div>
+        <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+    </main>
+</div>
+
+<style>
+    .details-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .detail-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .card-header {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .info-item label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .info-item span {
+        font-size: 16px;
+        color: #333;
+    }
+    .amount {
+        font-size: 20px !important;
+        font-weight: 700;
+        color: #28a745 !important;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+</style>
+</body>
+</html>
+

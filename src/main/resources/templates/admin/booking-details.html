@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('bookings')}"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📋 Booking Details #<span th:text="${booking.id}">1</span></h1>
+                <div>
+                    <a href="/admin/bookings" class="btn btn-secondary">← Back to List</a>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="details-card">
+                <div class="details-section">
+                    <h3>📅 Booking Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Booking ID:</label>
+                            <span th:text="${booking.id}">#1</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status:</label>
+                            <span class="status-badge"
+                                  th:classappend="${booking.status.name() == 'CONFIRMED' ? 'status-confirmed' : (booking.status.name() == 'PENDING_PAYMENT' ? 'status-pending' : (booking.status.name() == 'CANCELLED' ? 'status-cancelled' : 'status-active'))}"
+                                  th:text="${booking.status}">CONFIRMED</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Check-in Date:</label>
+                            <span th:text="${booking.checkInDate}">2026-01-01</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Check-out Date:</label>
+                            <span th:text="${booking.checkOutDate}">2026-01-03</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Number of Guests:</label>
+                            <span th:text="${booking.numberOfGuests}">2</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Total Amount:</label>
+                            <span th:text="'$' + ${booking.totalAmount}">$200</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Created At:</label>
+                            <span th:text="${booking.createdAt != null ? #temporals.format(booking.createdAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">2026-01-01</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>🛏️ Room Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Room Number:</label>
+                            <span th:text="${booking.room.roomNumber}">101</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Room Type:</label>
+                            <span th:text="${booking.room.roomType}">Standard</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Price per Night:</label>
+                            <span th:text="'$' + ${booking.room.pricePerNight}">$100</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Capacity:</label>
+                            <span th:text="${booking.room.capacity}">2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>👤 Customer Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Full Name:</label>
+                            <span th:text="${booking.customer.fullName}">John Doe</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email:</label>
+                            <span th:text="${booking.customer.email}">john@email.com</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone:</label>
+                            <span th:text="${booking.customer.phoneNumber}">0123456789</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="details-section" th:if="${booking.payment != null}">
+                    <h3>💳 Payment Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Payment Method:</label>
+                            <span th:text="${booking.payment.paymentMethod}">Credit Card</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Payment Status:</label>
+                            <span th:text="${booking.payment.status}">PAID</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Payment Date:</label>
+                            <span th:text="${booking.payment.paymentDate != null ? #temporals.format(booking.payment.paymentDate, 'yyyy-MM-dd HH:mm') : 'N/A'}">2026-01-01</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cancellation Information (chỉ hiển thị khi booking đã bị hủy) -->
+                <div class="details-section" th:if="${booking.status.name() == 'CANCELLED'}">
+                    <h3>🚫 Cancellation Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item" th:if="${booking.cancellationReason != null and !booking.cancellationReason.isEmpty()}">
+                            <label>Lý do hủy:</label>
+                            <span th:text="${booking.cancellationReason}">Thay đổi kế hoạch</span>
+                        </div>
+                        <div class="detail-item" th:if="${booking.cancellationNote != null and !booking.cancellationNote.isEmpty()}">
+                            <label>Ghi chú hủy:</label>
+                            <span style="white-space: pre-wrap;" th:text="${booking.cancellationNote}">Chi tiết lý do hủy...</span>
+                        </div>
+                        <div class="detail-item" th:if="${booking.cancelledAt != null}">
+                            <label>Thời gian hủy:</label>
+                            <span th:text="${#temporals.format(booking.cancelledAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+

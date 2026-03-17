@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create/Edit Booking - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('bookings')}"></aside>
+
+        <!-- Main Content - Only Admin and Manager can access this form -->
+        <main class="main-content" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+            <div class="page-header">
+                <h1 th:text="${booking != null && booking.id != null ? 'Edit Booking #' + booking.id : 'Create New Booking'}">Create Booking</h1>
+                <a href="/admin/bookings" class="btn btn-secondary">← Back to List</a>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="form-card">
+                <form th:action="${booking != null && booking.id != null ? '/admin/bookings/' + booking.id + '/update' : '/admin/bookings/create'}" method="post">
+
+                    <h3>Room Selection</h3>
+                    <div class="form-group">
+                        <label for="roomId">Select Room *</label>
+                        <select id="roomId" name="roomId" required>
+                            <option value="">-- Select Room --</option>
+                            <option th:each="room : ${rooms}"
+                                    th:value="${room.id}"
+                                    th:text="${room.roomNumber + ' - ' + room.roomType + ' ($' + room.pricePerNight + '/night)'}"
+                                    th:selected="${booking != null && booking.room != null && booking.room.id == room.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <h3>Booking Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkInDate">Check-in Date *</label>
+                            <input type="date" id="checkInDate" name="checkInDate" required
+                                   th:value="${booking != null ? booking.checkInDate : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkOutDate">Check-out Date *</label>
+                            <input type="date" id="checkOutDate" name="checkOutDate" required
+                                   th:value="${booking != null ? booking.checkOutDate : ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numberOfGuests">Number of Guests *</label>
+                        <input type="number" id="numberOfGuests" name="numberOfGuests" min="1" max="10" required
+                               th:value="${booking != null ? booking.numberOfGuests : 1}">
+                    </div>
+
+                    <h3>Customer Information</h3>
+                    <div class="form-group">
+                        <label for="customerName">Full Name *</label>
+                        <input type="text" id="customerName" name="customerName" required
+                               th:value="${booking != null && booking.customer != null ? booking.customer.fullName : ''}">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerEmail">Email *</label>
+                            <input type="email" id="customerEmail" name="customerEmail" required
+                                   th:value="${booking != null && booking.customer != null ? booking.customer.email : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number *</label>
+                            <input type="tel" id="customerPhone" name="customerPhone" required
+                                   th:value="${booking != null && booking.customer != null ? booking.customer.phoneNumber : ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span th:text="${booking != null && booking.id != null ? 'Update Booking' : 'Create Booking'}">Save</span>
+                        </button>
+                        <a href="/admin/bookings" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Show access denied message for Staff role -->
+        <main class="main-content" th:if="${session.role == null or session.role.equalsIgnoreCase('staff')}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to create or edit bookings.</p>
+                <p>Only <strong>Admin</strong> and <strong>Manager</strong> can perform this action.</p>
+            </div>
+            <a href="/admin/bookings" class="btn btn-secondary">← Back to Bookings</a>
+        </main>
+    </div>
+
+    <script>
+        // Set min date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkInDate').setAttribute('min', today);
+            document.getElementById('checkOutDate').setAttribute('min', today);
+
+            // Update checkout min based on checkin
+            document.getElementById('checkInDate').addEventListener('change', function() {
+                document.getElementById('checkOutDate').setAttribute('min', this.value);
+            });
+        });
+    </script>
+</body>
+</html>
+

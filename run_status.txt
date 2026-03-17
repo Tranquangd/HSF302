@@ -1,0 +1,7 @@
+===NETSTAT===
+  TCP    0.0.0.0:8088           0.0.0.0:0              LISTENING       10288
+  TCP    [::]:8088              [::]:0                 LISTENING       10288
+
+===HTTP===
+StatusCode=200
+

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-inner">
+                <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+                <nav>
+                    <a th:href="@{/}">Trang chủ</a>
+                    <a th:href="@{/bookings/my-bookings}" class="active">📋 Đặt phòng của tôi</a>
+                </nav>
+                <div class="header-auth">
+                    <a th:if="${session.user}" th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
+                    <a th:unless="${session.user}" th:href="@{/login}" class="btn-white">Đăng nhập</a>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="success-container">
+                <div th:if="${success}" class="alert alert-success">
+                    <span th:text="${success}"></span>
+                </div>
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div class="success-icon" th:if="${success}">✅</div>
+                <div class="success-icon" th:if="${error}">⚠️</div>
+
+                <h2 th:if="${success}">Payment Successful!</h2>
+                <h2 th:if="${error}">Payment Failed</h2>
+
+                <p th:if="${success}">Your booking has been confirmed with a simple payment.</p>
+                <p th:if="${error}">Your payment could not be completed. Please check the error message above and try again.</p>
+
+                <div class="success-details">
+                    <p th:if="${paymentId != null and paymentId > 0}">
+                        <strong>Payment ID:</strong>
+                        <span th:text="${paymentId}"></span>
+                    </p>
+                    <p th:if="${success}">A confirmation email has been sent to your registered email address.</p>
+                </div>
+                
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
+                    <a th:href="@{/bookings/search}" class="btn btn-secondary">Make Another Booking</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

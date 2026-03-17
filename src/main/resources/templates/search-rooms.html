@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Phòng - Hotel Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/chatbox.css}">
+
+    <style>
+        /* Giữ nguyên các biến root và style chung từ index */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gold: #C9A96E;
+            --gold-light: #E8CFAB;
+            --gold-dim: rgba(201,169,110,0.15);
+            --dark: #0D0D0D;
+            --dark-2: #141414;
+            --dark-3: #1C1C1C;
+            --dark-4: #252525;
+            --dark-5: #2E2E2E;
+            --text: #E8E2D9;
+            --text-muted: #8A8278;
+            --text-dim: #5C5650;
+            --border: rgba(201,169,110,0.18);
+            --border-subtle: rgba(255,255,255,0.06);
+            --radius: 4px;
+            --radius-md: 8px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Noise overlay giống index */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .container { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+
+        /* Header - copy y hệt index để đồng bộ */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13,13,13,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            gap: 24px;
+        }
+
+        .header-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav a {
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            padding: 7px 14px;
+            border-radius: var(--radius);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--gold);
+            background: var(--gold-dim);
+        }
+
+        .btn-logout, .btn-primary-outline, .btn-white {
+            font-size: 0.78rem;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: var(--radius);
+            text-transform: uppercase;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-logout { color: var(--text-dim); border: 1px solid var(--border-subtle); }
+        .btn-logout:hover { color: var(--text-muted); border-color: var(--border); }
+
+        .btn-primary-outline { color: var(--gold); border: 1px solid var(--border); }
+        .btn-primary-outline:hover { background: var(--gold-dim); }
+
+        .btn-white { background: var(--gold); color: var(--dark); border: 1px solid var(--gold); }
+        .btn-white:hover { background: var(--gold-light); }
+
+        /* ─── SEARCH FORM ─── */
+        .search-hero {
+            padding: 100px 0 140px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(201,169,110,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .search-hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.2rem, 7vw, 5.5rem);
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .search-hero h1 em {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .search-hero p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 620px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+        }
+
+        .form-container {
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 48px 40px;
+            max-width: 680px;
+            margin: 0 auto;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-md);
+            pointer-events: none;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .form-container h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.1rem;
+            font-weight: 400;
+            color: var(--gold);
+            margin-bottom: 32px;
+            text-align: center;
+            letter-spacing: -0.01em;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--dark-4);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+        }
+
+        .form-group .error {
+            color: #e07070;
+            font-size: 0.82rem;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 32px;
+            background: rgba(220,60,60,0.12);
+            border: 1px solid rgba(220,60,60,0.3);
+            color: #e07070;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .alert strong {
+            color: #ff9999;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 36px;
+        }
+
+        .btn {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 14px 32px;
+            border-radius: var(--radius);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201,169,110,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text);
+            border-color: var(--text-muted);
+            background: var(--gold-dim);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-hero { padding: 80px 0 100px; }
+            .form-container { padding: 36px 24px; }
+            .form-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header giống hệt index -->
+    <header>
+        <div class="header-inner">
+            <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+            <nav>
+                <a th:href="@{/}">Trang chủ</a>
+                <a th:href="@{/bookings/search}" class="active">🔍 Tìm phòng</a>
+                <a th:if="${session.user}" th:href="@{/bookings/my-bookings}">📋 Đặt phòng của tôi</a>
+            </nav>
+            <div class="header-auth">
+                <div th:if="${session.user}">
+                    <a th:href="@{/bookings/my-bookings}" class="btn-primary-outline">📋 Đặt phòng của tôi</a>
+                    <a th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
+                </div>
+                <div th:unless="${session.user}">
+                    <a th:href="@{/login}" class="btn-primary-outline">Đăng nhập</a>
+                    <a th:href="@{/register}" class="btn-white">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-hero">
+        <h1>Find Your<br><em>Perfect Stay</em></h1>
+        <p>Chọn ngày lưu trú và số lượng khách để xem các phòng sang trọng còn trống ngay hôm nay.</p>
+
+        <div class="form-container">
+            <h2>Tìm Phòng Trống</h2>
+
+            <div th:if="${error}" class="alert">
+                <div th:if="${error.contains('No available') or error.contains('no available')}">
+                    <strong>🚫 Không có phòng trống trong khoảng thời gian này!</strong><br>
+                    Tất cả phòng phù hợp đã được đặt. Vui lòng thử thay đổi ngày hoặc loại phòng.
+                </div>
+                <div th:unless="${error.contains('No available') or error.contains('no available')}">
+                    <span th:text="${error}"></span>
+                </div>
+            </div>
+
+            <form th:action="@{/bookings/search}" th:object="${searchRequest}" method="post">
+                <div class="form-group">
+                    <label for="checkInDate">Ngày nhận phòng</label>
+                    <input type="date" id="checkInDate" th:field="*{checkInDate}">
+                    <span class="error" th:if="${#fields.hasErrors('checkInDate')}" th:errors="*{checkInDate}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="checkOutDate">Ngày trả phòng</label>
+                    <input type="date" id="checkOutDate" th:field="*{checkOutDate}">
+                    <span class="error" th:if="${#fields.hasErrors('checkOutDate')}" th:errors="*{checkOutDate}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="numberOfGuests">Số lượng khách</label>
+                    <input type="number" id="numberOfGuests" th:field="*{numberOfGuests}" min="1" max="10">
+                    <span class="error" th:if="${#fields.hasErrors('numberOfGuests')}" th:errors="*{numberOfGuests}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomNumber">Số phòng (tùy chọn)</label>
+                    <input type="text" id="roomNumber" th:field="*{roomNumber}"
+                           placeholder="Nhập số phòng, ví dụ: 101 hoặc chỉ '1' để lọc tất cả phòng chứa số 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Loại phòng (tùy chọn)</label>
+                    <select id="roomType" th:field="*{roomType}">
+                        <option value="">Tất cả loại phòng</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Presidential">Presidential</option>
+                        <option value="Penthouse">Penthouse</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">🔍 Tìm phòng ngay</button>
+                    <a th:href="@{/}" class="btn btn-secondary">Quay lại trang chủ</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Hotel Booking System — All rights reserved.</p>
+    </footer>
+</div>
+
+<!-- Chatbox widget (giữ nguyên như index) -->
+<div class="chatbox-widget" id="chatboxWidget">
+    <!-- ... copy toàn bộ phần chatbox từ index.html của bạn ... -->
+</div>
+
+<script th:src="@{/js/chatbox-widget.js}"></script>
+</body>
+</html>

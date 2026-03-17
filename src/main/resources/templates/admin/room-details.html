@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Details - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('rooms')}"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>🛏️ Room Details - <span th:text="${room.roomNumber}">101</span></h1>
+                <div>
+                    <a th:href="@{/admin/rooms/edit/{id}(id=${room.id})}" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}" class="btn btn-primary">✏️ Edit</a>
+                    <a href="/admin/rooms" class="btn btn-secondary">← Back to List</a>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="details-card">
+                <div class="details-section">
+                    <h3>🛏️ Room Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Room ID:</label>
+                            <span th:text="${room.id}">1</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Room Number:</label>
+                            <span th:text="${room.roomNumber}">101</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Room Type:</label>
+                            <span th:text="${room.roomType}">Standard</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Price per Night:</label>
+                            <span th:text="'$' + ${room.pricePerNight}">$100</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Capacity:</label>
+                            <span th:text="${room.capacity}">2</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status:</label>
+                            <span class="status-badge"
+                                  th:classappend="${room.available ? 'status-active' : 'status-inactive'}"
+                                  th:text="${room.available ? 'Available' : 'Unavailable'}">Available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section" th:if="${room.description != null && !room.description.isEmpty()}">
+                    <h3>📝 Description</h3>
+                    <p th:text="${room.description}">Room description here</p>
+                </div>
+
+                <div class="details-section" th:if="${room.imageUrl != null && !room.imageUrl.isEmpty()}">
+                    <h3>📷 Room Image</h3>
+                    <img th:src="${room.imageUrl}" alt="Room Image" style="max-width: 400px; border-radius: 8px;">
+                </div>
+
+                <!-- Actions - Admin Only -->
+                <div class="details-actions" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}">
+                    <h3>⚡ Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a th:href="@{/admin/rooms/edit/{id}(id=${room.id})}" class="btn btn-primary">✏️ Edit Room</a>
+                        <button class="btn btn-secondary" th:onclick="'toggleRoomStatus(' + ${room.id} + ', ' + ${room.available} + ')'">
+                            <span th:text="${room.available ? '🔒 Set Unavailable' : '🔓 Set Available'}">Toggle Status</span>
+                        </button>
+                        <button class="btn btn-danger" th:onclick="'deleteRoom(' + ${room.id} + ')'">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleRoomStatus(id, currentStatus) {
+            if (confirm('Change room status to ' + (currentStatus ? 'Unavailable' : 'Available') + '?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/rooms/' + id + '/status';
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'available';
+                input.value = !currentStatus;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function deleteRoom(id) {
+            if (confirm('Are you sure you want to delete this room?')) {
+                fetch('/admin/rooms/' + id + '/delete', { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/admin/rooms';
+                        } else {
+                            alert('Failed to delete room');
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+

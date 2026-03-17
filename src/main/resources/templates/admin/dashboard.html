@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('dashboard')}"></aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📊 Dashboard</h1>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📅</div>
+                    <div class="stat-info">
+                        <h3 th:text="${totalBookings}">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">🛏️</div>
+                    <div class="stat-info">
+                        <h3 th:text="${totalRooms}">0</h3>
+                        <p>Total Rooms</p>
+                    </div>
+                </div>
+                <!-- Customers stat card - Only visible to Admin and Manager (Staff cannot access customer management) -->
+                <div class="stat-card" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+                    <div class="stat-icon orange">👤</div>
+                    <div class="stat-info">
+                        <h3 th:text="${totalCustomers}">0</h3>
+                        <p>Customers</p>
+                    </div>
+                </div>
+                <div class="stat-card" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+                    <div class="stat-icon purple">👥</div>
+                    <div class="stat-info">
+                        <h3 th:text="${totalUsers}">0</h3>
+                        <p>Staff Members</p>
+                    </div>
+                </div>
+                <!-- Total Revenue -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💰</div>
+                    <div class="stat-info">
+                        <h3 th:text="${#numbers.formatDecimal(totalRevenue != null ? totalRevenue : 0, 0, 'COMMA', 0, 'POINT')}">0</h3>
+                        <p>Total Revenue (VNĐ)</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 15px;">Quick Actions</h2>
+            <div class="quick-actions">
+                <!-- Admin và Manager có thể tạo booking -->
+                <a href="/admin/bookings/create" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}" class="quick-action-btn">➕ Create Booking</a>
+                <!-- Chỉ Admin có thể thêm phòng -->
+                <a href="/admin/rooms/create" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}" class="quick-action-btn">➕ Add Room</a>
+                <!-- Chỉ Admin có thể tạo manager -->
+                <a href="/admin/users/create-manager" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}" class="quick-action-btn">➕ Create Manager</a>
+                <!-- Tất cả roles có thể xem bookings -->
+                <a href="/admin/bookings" class="quick-action-btn">📋 View All Bookings</a>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>Recent Bookings</h2>
+                    <a href="/admin/bookings" class="btn btn-secondary">View All</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Room</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${recentBookings}">
+                            <td th:text="${booking.id}">#1</td>
+                            <td th:text="${booking.customer.fullName}">John Doe</td>
+                            <td th:text="${booking.room.roomNumber}">101</td>
+                            <td th:text="${booking.checkInDate}">2026-01-01</td>
+                            <td th:text="${booking.checkOutDate}">2026-01-03</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${booking.status.name() == 'CONFIRMED' ? 'status-confirmed' : (booking.status.name() == 'PENDING_PAYMENT' ? 'status-pending' : 'status-cancelled')}"
+                                      th:text="${booking.status}">CONFIRMED</span>
+                            </td>
+                            <td class="action-btns">
+                                <a th:href="@{/admin/bookings/{id}(id=${booking.id})}" class="action-btn view">View</a>
+                                <!-- Only Admin and Manager can edit bookings -->
+                                <a th:href="@{/admin/bookings/edit/{id}(id=${booking.id})}" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}" class="action-btn edit">Edit</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentBookings)}">
+                            <td colspan="7" style="text-align: center; padding: 40px;">No bookings found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
+
