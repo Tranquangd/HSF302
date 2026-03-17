@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nạp tiền vào ví - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-inner">
+            <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+            <nav>
+                <a th:href="@{/}">Trang chủ</a>
+                <a th:href="@{/wallet}" class="active">💰 Ví của tôi</a>
+            </nav>
+            <div class="header-auth">
+                <div th:if="${session.user}">
+                    <span class="user-name">👤 <span th:text="${session.username}"></span></span>
+                    <span class="user-name" style="margin-left:10px;">
+                        💰 <span th:text="${#numbers.formatDecimal(session.walletBalance != null ? session.walletBalance : 0, 0, 'COMMA', 0, 'POINT')}"></span> VND
+                    </span>
+                </div>
+                <a th:if="${session.user}" th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
+                <a th:unless="${session.user}" th:href="@{/login}" class="btn-white">Đăng nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="form-container" style="max-width:560px;">
+            <h2>➕ Nạp tiền vào ví</h2>
+
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+
+            <form th:action="@{/wallet/topup}" method="post">
+                <div class="form-group">
+                    <label for="amount">Số tiền (VND)</label>
+                    <input id="amount" name="amount" type="number" min="1" step="1" placeholder="VD: 50000" required>
+                </div>
+
+                <div class="form-actions" style="display:flex;gap:12px;">
+                    <a th:href="@{/wallet}" class="btn btn-secondary">← Quay lại</a>
+                    <button type="submit" class="btn btn-primary">Nạp tiền</button>
+                </div>
+            </form>
+            <p style="margin-top:10px;color:#666;font-size:0.9rem;">
+                Sau khi nạp, số dư sẽ được giữ lại và dùng để đặt phòng lần sau. Nếu đặt phòng ít tiền hơn, hệ thống chỉ trừ đúng số tiền và giữ số dư còn lại.
+            </p>
+        </div>
+    </main>
+</div>
+</body>
+</html>
+

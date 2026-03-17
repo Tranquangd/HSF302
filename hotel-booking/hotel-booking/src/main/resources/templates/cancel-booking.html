@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Phòng Của Tôi - Hotel Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/chatbox.css}">
+
+    <style>
+        :root {
+            --gold: #C9A96E;
+            --gold-light: #E8CFAB;
+            --gold-dim: rgba(201,169,110,0.15);
+            --dark: #0D0D0D;
+            --dark-2: #141414;
+            --dark-3: #1C1C1C;
+            --dark-4: #252525;
+            --dark-5: #2E2E2E;
+            --text: #E8E2D9;
+            --text-muted: #8A8278;
+            --text-dim: #5C5650;
+            --border: rgba(201,169,110,0.18);
+            --border-subtle: rgba(255,255,255,0.06);
+            --radius: 4px;
+            --radius-md: 8px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+
+        body { background: var(--dark); color: var(--text); }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* Header đồng bộ */
+        header { /* copy y hệt các trang trước */ }
+
+        .my-bookings-hero {
+            padding: 100px 0 60px;
+            text-align: center;
+        }
+
+        .my-bookings-hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 6vw, 4.8rem);
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+
+        .my-bookings-hero h1 em {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .my-bookings-hero p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 680px;
+            margin: 0 auto 48px;
+        }
+
+        .bookings-container {
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 1100px;
+            margin: 0 auto 80px;
+        }
+
+        .bookings-container h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            color: var(--gold);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .booking-card {
+            background: var(--dark-3);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            transition: all 0.3s;
+        }
+
+        .booking-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .booking-info h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            margin: 0 0 12px;
+            color: var(--text);
+        }
+
+        .booking-info p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin: 8px 0;
+        }
+
+        .booking-info strong {
+            color: var(--gold);
+        }
+
+        .booking-status {
+            text-align: right;
+            min-width: 160px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-pending   { background: rgba(220,160,30,0.2); color: #d4aa50; border: 1px solid rgba(220,160,30,0.4); }
+        .status-confirmed { background: rgba(60,180,100,0.2); color: #5cc880; border: 1px solid rgba(60,180,100,0.4); }
+        .status-cancelled { background: rgba(220,60,60,0.2); color: #e07070; border: 1px solid rgba(220,60,60,0.4); }
+        .status-completed { background: rgba(100,100,255,0.2); color: #8a8aff; border: 1px solid rgba(100,100,255,0.4); }
+
+        .booking-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            font-size: 0.82rem;
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .btn-view   { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
+        .btn-view:hover   { background: var(--gold); color: var(--dark); }
+
+        .btn-cancel { background: rgba(192,57,43,0.15); color: #e74c3c; border: 1px solid rgba(192,57,43,0.3); }
+        .btn-cancel:hover { background: #c0392b; color: white; }
+
+        .no-bookings {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-dim);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-md);
+        }
+
+        @media (max-width: 900px) {
+            .booking-card { grid-template-columns: 1fr; }
+            .booking-status { text-align: left; margin-top: 16px; }
+            .booking-actions { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header đồng bộ -->
+    <header>
+        <div class="header-inner">
+            <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+            <nav>
+                <a th:href="@{/}">Trang chủ</a>
+                <a th:href="@{/bookings/search}">🔍 Tìm phòng</a>
+                <a th:href="@{/bookings/my-bookings}" class="active">📋 Đặt phòng của tôi</a>
+            </nav>
+            <div class="header-auth">
+                <div th:if="${session.user}">
+                    <span class="user-name">👤 <span th:text="${session.username}"></span></span>
+                    <span class="user-name" style="margin-left:12px;" th:if="${session.role == 'customer'}">
+                        💰 <span th:text="${#numbers.formatDecimal(session.walletBalance != null ? session.walletBalance : 0, 0, 'COMMA', 0, 'POINT')}"></span> VND
+                    </span>
+                    <a th:href="@{/logout}" class="btn-logout" style="margin-left:16px;">Đăng xuất</a>
+                </div>
+                <div th:unless="${session.user}">
+                    <a th:href="@{/login}" class="btn-primary-outline">Đăng nhập</a>
+                    <a th:href="@{/register}" class="btn-white">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="my-bookings-hero">
+        <h1>My<br><em>Reservations</em></h1>
+        <p>Quản lý tất cả đặt phòng của bạn — xem chi tiết, hủy hoặc kiểm tra trạng thái bất cứ lúc nào.</p>
+    </section>
+
+    <div class="bookings-container">
+        <h2>Danh sách đặt phòng</h2>
+
+        <div th:if="${bookings != null and !bookings.isEmpty()}" class="booking-list">
+            <div class="booking-card" th:each="booking : ${bookings}">
+                <div class="booking-info">
+                    <h3>Đặt phòng #<span th:text="${booking.bookingId}"></span></h3>
+                    <p><strong>Phòng:</strong> <span th:text="${booking.roomNumber}"></span> — <span th:text="${booking.roomType}"></span></p>
+                    <p><strong>Thời gian:</strong>
+                        <span th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}"></span> →
+                        <span th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}"></span>
+                    </p>
+                    <p><strong>Số khách:</strong> <span th:text="${booking.numberOfGuests}"></span></p>
+                    <p><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')}"></span> VNĐ</p>
+                </div>
+
+                <div class="booking-status">
+                    <div class="status-badge"
+                         th:classappend="${booking.status == 'PENDING' ? 'status-pending' :
+                                          (booking.status == 'CONFIRMED' ? 'status-confirmed' :
+                                          (booking.status == 'CANCELLED' ? 'status-cancelled' : 'status-completed'))}"
+                         th:text="${booking.status}"></div>
+
+                    <div class="booking-actions">
+                        <a th:href="@{/bookings/{id}(id=${booking.bookingId})}" class="btn-action btn-view">Xem chi tiết</a>
+                        <a th:if="${booking.status == 'PENDING' or booking.status == 'CONFIRMED'}"
+                           th:href="@{/bookings/{id}/cancel(id=${booking.bookingId})}"
+                           class="btn-action btn-cancel">Hủy đặt phòng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${bookings == null or bookings.isEmpty()}" class="no-bookings">
+            Bạn chưa có đặt phòng nào.<br>
+            <a th:href="@{/bookings/search}" style="color: var(--gold); text-decoration: underline;">Tìm phòng ngay</a> để bắt đầu trải nghiệm!
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Hotel Booking System — All rights reserved.</p>
+    </footer>
+</div>
+
+<!-- Chatbox widget -->
+<div class="chatbox-widget" id="chatboxWidget">
+    <!-- ... nội dung chatbox giống các trang trước ... -->
+</div>
+
+<script th:src="@{/js/chatbox-widget.js}"></script>
+</body>
+</html>

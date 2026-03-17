@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('payments')}"></aside>
+
+        <main class="main-content" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>💳 Payment Details</h1>
+                <div class="header-actions">
+                    <a href="/admin/payments" class="btn btn-secondary">← Back to Payments</a>
+                </div>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div th:if="${payment != null}" class="details-container">
+                <!-- Payment Information Card -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h2>💰 Payment Information</h2>
+                        <span class="status-badge"
+                              th:classappend="${payment.status.name() == 'SUCCESS' ? 'status-confirmed' : (payment.status.name() == 'PENDING' ? 'status-pending' : 'status-cancelled')}"
+                              th:text="${payment.status}">SUCCESS</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Payment ID</label>
+                                <span th:text="'#' + ${payment.id}">#1</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Amount</label>
+                                <span class="amount" th:text="${#numbers.formatDecimal(payment.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,000,000 VND</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Payment Method</label>
+                                <span class="badge"
+                                      th:classappend="${payment.paymentMethod.name() == 'CASH' ? 'badge-warning' : 'badge-secondary'}"
+                                      th:text="${payment.paymentMethod}">CASH</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Transaction ID</label>
+                                <span th:if="${payment.transactionId != null}" th:text="${payment.transactionId}">TXN123456</span>
+                                <span th:unless="${payment.transactionId != null}" class="text-muted">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Payment Date</label>
+                                <span th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}">01/01/2026 10:00:00</span>
+                            </div>
+                            <div class="info-item" th:if="${payment.failureReason != null}">
+                                <label>Failure Reason</label>
+                                <span class="text-danger" th:text="${payment.failureReason}">Payment declined</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Information Card -->
+                <div class="detail-card" th:if="${payment.booking != null}">
+                    <div class="card-header">
+                        <h2>📅 Booking Information</h2>
+                        <a th:href="@{/admin/bookings/{id}(id=${payment.booking.id})}" class="btn btn-sm btn-primary">View Booking</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Booking ID</label>
+                                <span th:text="'#' + ${payment.booking.id}">#1</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Room</label>
+                                <span th:text="${payment.booking.room != null ? payment.booking.room.roomNumber + ' - ' + payment.booking.room.roomType : 'N/A'}">101 - Deluxe</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Check-in Date</label>
+                                <span th:text="${#temporals.format(payment.booking.checkInDate, 'dd/MM/yyyy')}">01/01/2026</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Check-out Date</label>
+                                <span th:text="${#temporals.format(payment.booking.checkOutDate, 'dd/MM/yyyy')}">02/01/2026</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Number of Guests</label>
+                                <span th:text="${payment.booking.numberOfGuests}">2</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Booking Status</label>
+                                <span class="status-badge"
+                                      th:classappend="${payment.booking.status.name() == 'CONFIRMED' ? 'status-confirmed' : (payment.booking.status.name() == 'PENDING_PAYMENT' ? 'status-pending' : 'status-cancelled')}"
+                                      th:text="${payment.booking.status}">CONFIRMED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Information Card -->
+                <div class="detail-card" th:if="${payment.booking != null and payment.booking.customer != null}">
+                    <div class="card-header">
+                        <h2>👤 Customer Information</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Full Name</label>
+                                <span th:text="${payment.booking.customer.fullName}">John Doe</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <span th:text="${payment.booking.customer.email}">john@example.com</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Phone Number</label>
+                                <span th:text="${payment.booking.customer.phoneNumber}">0123456789</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Refund Action -->
+                <div class="detail-card" th:if="${payment.status == T(com.example.hotelbooking.enums.PaymentStatus).SUCCESS}">
+                    <div class="card-header">
+                        <h2>⚡ Actions</h2>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/payments/refund/{id}(id=${payment.booking.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Bạn có chắc muốn hoàn tiền cho payment này?');">
+                            <button type="submit" class="btn btn-warning" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;">💰 Refund Payment</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Refunded notice -->
+                <div class="detail-card" th:if="${payment.status == T(com.example.hotelbooking.enums.PaymentStatus).REFUNDED}">
+                    <div class="card-header" style="background: #fff3cd;">
+                        <h2>💰 Refund Processed</h2>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: #856404;">Payment này đã được hoàn tiền thành công.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${payment == null}" class="empty-state">
+                <p>Payment not found</p>
+                <a href="/admin/payments" class="btn btn-primary">Back to Payments</a>
+            </div>
+        </main>
+
+        <!-- Show access denied message for non-Admin roles -->
+        <main class="main-content" th:if="${session.role == null or !session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to view Payment Details.</p>
+                <p>Only <strong>Admin</strong> can access this section.</p>
+            </div>
+            <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </main>
+    </div>
+
+    <style>
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .detail-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .info-item label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .info-item span {
+            font-size: 16px;
+            color: #333;
+        }
+        .amount {
+            font-size: 20px !important;
+            font-weight: 700;
+            color: #28a745 !important;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .badge-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+        .text-danger {
+            color: #dc3545;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</body>
+</html>
+
+
+

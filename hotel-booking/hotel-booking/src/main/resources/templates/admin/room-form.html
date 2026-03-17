@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Form - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('rooms')}"></aside>
+
+        <!-- Main Content - Only Admin can manage rooms -->
+        <main class="main-content" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1 th:text="${room != null && room.id != null ? 'Edit Room' : 'Add New Room'}">Add Room</h1>
+                <a href="/admin/rooms" class="btn btn-secondary">← Back</a>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error"><span th:text="${error}"></span></div>
+
+            <div class="form-card">
+                <form th:action="${room != null && room.id != null ? '/admin/rooms/' + room.id + '/update' : '/admin/rooms/create'}" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomNumber">Room Number *</label>
+                            <input type="text" id="roomNumber" name="roomNumber" required th:value="${room?.roomNumber}">
+                        </div>
+                        <div class="form-group">
+                            <label for="roomType">Room Type *</label>
+                            <select id="roomType" name="roomType" required>
+                                <option value="">Select Type</option>
+                                <option value="Standard" th:selected="${room?.roomType == 'Standard'}">Standard</option>
+                                <option value="Deluxe" th:selected="${room?.roomType == 'Deluxe'}">Deluxe</option>
+                                <option value="Suite" th:selected="${room?.roomType == 'Suite'}">Suite</option>
+                                <option value="Family" th:selected="${room?.roomType == 'Family'}">Family</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pricePerNight">Price per Night ($) *</label>
+                            <input type="number" id="pricePerNight" name="pricePerNight" step="0.01" min="0" required th:value="${room?.pricePerNight}">
+                        </div>
+                        <div class="form-group">
+                            <label for="capacity">Capacity *</label>
+                            <input type="number" id="capacity" name="capacity" min="1" max="10" required th:value="${room?.capacity}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="3" th:text="${room?.description}"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageUrl">Image URL</label>
+                        <input type="text" id="imageUrl" name="imageUrl" th:value="${room?.imageUrl}">
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="available" th:checked="${room == null || room.available}"> Available</label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Room</button>
+                        <a href="/admin/rooms" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Show access denied message for non-Admin roles -->
+        <main class="main-content" th:if="${session.role == null or !session.role.equalsIgnoreCase('admin')}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to add or edit rooms.</p>
+                <p>Only <strong>Admin</strong> can perform this action.</p>
+            </div>
+            <a href="/admin/rooms" class="btn btn-secondary">← Back to Rooms</a>
+        </main>
+    </div>
+</body>
+</html>
+

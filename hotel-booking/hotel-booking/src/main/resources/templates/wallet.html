@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ví của tôi - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-inner">
+            <a th:href="@{/}" class="header-logo"><span>🏨</span> Hotel Booking</a>
+            <nav>
+                <a th:href="@{/}">Trang chủ</a>
+                <a th:href="@{/bookings/search}">🔍 Tìm phòng</a>
+                <a th:href="@{/bookings/my-bookings}">📋 Đặt phòng của tôi</a>
+                <a th:href="@{/wallet}" class="active">💰 Ví của tôi</a>
+            </nav>
+            <div class="header-auth">
+                <div th:if="${session.user}">
+                    <span class="user-name">👤 <span th:text="${session.username}"></span></span>
+                    <span class="user-name" style="margin-left:10px;">
+                        💰 <span th:text="${#numbers.formatDecimal(session.walletBalance != null ? session.walletBalance : 0, 0, 'COMMA', 0, 'POINT')}"></span> VND
+                    </span>
+                </div>
+                <a th:if="${session.user}" th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
+                <a th:unless="${session.user}" th:href="@{/login}" class="btn-white">Đăng nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h2>💰 Ví điện tử trong khách sạn</h2>
+
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <section class="wallet-summary" th:if="${wallet != null}">
+            <div class="card">
+                <h3>Số dư hiện tại</h3>
+                <p class="wallet-balance">
+                    <span th:text="${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+                </p>
+                <div style="margin: 12px 0;">
+                    <a th:href="@{/wallet/topup}" class="btn btn-primary">➕ Nạp tiền</a>
+                </div>
+                <p class="wallet-note">
+                    Số tiền hoàn từ các đặt phòng (tiền mặt / VNPay) sẽ được cộng vào ví này. Bạn có thể dùng số dư ví để
+                    trừ khi thanh toán các dịch vụ khác (tùy chính sách khách sạn).
+                </p>
+            </div>
+        </section>
+
+        <section class="wallet-transactions">
+            <h3>Lịch sử giao dịch ví</h3>
+
+            <div th:if="${transactions != null and !transactions.isEmpty()}">
+                <table class="booking-table">
+                    <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Loại</th>
+                        <th>Số tiền</th>
+                        <th>Booking</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="tx : ${transactions}">
+                        <td th:text="${tx.createdAt != null ? #temporals.format(tx.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${tx.type.name() == 'CREDIT' ? 'badge-success' : 'badge-error'}"
+                                  th:text="${tx.type}">CREDIT</span>
+                        </td>
+                        <td>
+                            <span th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+                        </td>
+                        <td th:text="${tx.bookingId != null ? '#' + tx.bookingId : '-'}"></td>
+                        <td th:text="${tx.description}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${transactions == null or transactions.isEmpty()}" class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>Ví của bạn chưa có giao dịch nào.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Hotel Booking System. All rights reserved.</p>
+    </footer>
+</div>
+
+<style>
+    .wallet-summary .card {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .wallet-balance {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #27ae60;
+        margin: 10px 0 5px;
+    }
+    .wallet-note {
+        font-size: 0.9rem;
+        color: #666;
+    }
+</style>
+</body>
+</html>
+
