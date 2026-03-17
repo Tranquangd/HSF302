@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <style>
+        .cash-info {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .payment-method-icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="form-container">
+                <h2>Payment Information</h2>
+
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form th:action="@{/payments/process}" th:object="${paymentRequest}" method="post">
+                    <input type="hidden" th:field="*{bookingId}">
+
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method:</label>
+                        <select id="paymentMethod" th:field="*{paymentMethod}" required onchange="togglePaymentFields()">
+                            <option value="">Select Payment Method</option>
+                            <option value="CASH">💵 Cash (Pay at reception)</option>
+                            <option value="CREDIT_CARD">💳 Card</option>
+                        </select>
+                        <span class="error" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></span>
+                    </div>
+
+                    <div id="cardFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number:</label>
+                            <input type="text" id="cardNumber" th:field="*{cardNumber}" placeholder="4111111111111111" maxlength="16">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cardHolderName">Card Holder Name:</label>
+                            <input type="text" id="cardHolderName" th:field="*{cardHolderName}" placeholder="John Doe">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date:</label>
+                                <input type="text" id="expiryDate" th:field="*{expiryDate}" placeholder="MM/YY" maxlength="5">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cvv">CVV:</label>
+                                <input type="text" id="cvv" th:field="*{cvv}" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn btn-primary">Pay Now</button>
+                        <a th:href="@{/bookings/{id}(id=${bookingId})}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+
+    <script>
+        function togglePaymentFields() {
+            var paymentMethod = document.getElementById('paymentMethod').value;
+            var cardFields = document.getElementById('cardFields');
+
+            if (paymentMethod === 'CREDIT_CARD') {
+                cardFields.style.display = 'block';
+            } else {
+                cardFields.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            togglePaymentFields();
+        });
+    </script>
+</body>
+</html>

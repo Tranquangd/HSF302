@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking System</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <p class="subtitle">Welcome to our hotel booking platform</p>
+            
+            <div th:if="${session.user}" class="user-info">
+                <span>👤 <strong th:text="${session.username}"></strong></span>
+                <span class="badge" th:classappend="${session.role == 'admin' ? 'badge-error' : (session.role == 'manager' ? 'badge-warning' : 'badge-success')}" 
+                      th:text="${session.role}"></span>
+                <a th:href="@{/bookings/my-bookings}" class="btn btn-secondary" style="margin-left: 10px; padding: 8px 16px;">📋 My Bookings</a>
+                <a th:if="${session.role == 'admin' || session.role == 'manager'}" th:href="@{/admin/dashboard}" class="btn btn-primary" style="margin-left: 10px; padding: 8px 16px;">📊 Admin Panel</a>
+                <a th:href="@{/logout}" class="btn-logout">Logout</a>
+            </div>
+            <div th:unless="${session.user}" class="user-info">
+                <a th:href="@{/login}" class="btn btn-secondary">Login</a>
+            </div>
+        </header>
+        
+        <div class="hero">
+            <div class="hero-content">
+                <h2>Find Your Perfect Room</h2>
+                <p>Search and book hotel rooms with ease</p>
+                
+                <div class="action-buttons">
+                    <a th:href="@{/bookings/search}" class="btn btn-primary btn-large">
+                        🔍 Search Available Rooms
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <main>
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h3>🛏️ Wide Selection</h3>
+                    <p>Choose from Single, Double, Suite, and Family rooms</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💳 Easy Payment</h3>
+                    <p>Multiple payment methods supported</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Instant Confirmation</h3>
+                    <p>Get booking confirmation immediately</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

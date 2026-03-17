@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Rooms - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="form-container">
+                <h2>Search Available Rooms</h2>
+                
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <form th:action="@{/bookings/search}" th:object="${searchRequest}" method="post">
+                    <div class="form-group">
+                        <label for="checkInDate">Check-in Date:</label>
+                        <input type="date" id="checkInDate" th:field="*{checkInDate}" required>
+                        <span class="error" th:if="${#fields.hasErrors('checkInDate')}" th:errors="*{checkInDate}"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="checkOutDate">Check-out Date:</label>
+                        <input type="date" id="checkOutDate" th:field="*{checkOutDate}" required>
+                        <span class="error" th:if="${#fields.hasErrors('checkOutDate')}" th:errors="*{checkOutDate}"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="numberOfGuests">Number of Guests:</label>
+                        <input type="number" id="numberOfGuests" th:field="*{numberOfGuests}" min="1" max="10" required>
+                        <span class="error" th:if="${#fields.hasErrors('numberOfGuests')}" th:errors="*{numberOfGuests}"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomType">Room Type (Optional):</label>
+                        <select id="roomType" th:field="*{roomType}">
+                            <option value="">All Types</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Deluxe">Deluxe</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Presidential">Presidential</option>
+                            <option value="Penthouse">Penthouse</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">🔍 Search Rooms</button>
+                        <a th:href="@{/}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

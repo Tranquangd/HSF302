@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('customers')}"></aside>
+
+        <!-- Main Content - Admin/Manager only -->
+        <main class="main-content" th:if="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+            <div class="page-header">
+                <h1>👤 Customer Management</h1>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success"><span th:text="${success}"></span></div>
+            <div th:if="${error}" class="alert alert-error"><span th:text="${error}"></span></div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="customer : ${customers}">
+                            <td th:text="${customer.id}">1</td>
+                            <td><strong th:text="${customer.fullName}">John Doe</strong></td>
+                            <td th:text="${customer.email}">john@email.com</td>
+                            <td th:text="${customer.phoneNumber}">0123456789</td>
+                            <td>
+                                <span class="status-badge" th:classappend="${customer.status == 'active' || customer.status == null ? 'status-active' : 'status-inactive'}" th:text="${customer.status != null ? customer.status : 'active'}">active</span>
+                            </td>
+                            <td th:text="${customer.createdAt != null ? #temporals.format(customer.createdAt, 'yyyy-MM-dd') : 'N/A'}">2026-01-01</td>
+                            <td class="action-btns">
+                                <button class="action-btn view"
+                                        th:attr="data-id=${customer.id}"
+                                        onclick="viewCustomer(this.getAttribute('data-id'))">View</button>
+                                <!-- Only Admin and Manager can edit customers -->
+                                <button class="action-btn edit"
+                                        th:if="${session.role != null && (session.role.equalsIgnoreCase('admin') || session.role.equalsIgnoreCase('manager'))}"
+                                        th:attr="data-id=${customer.id},data-name=${customer.fullName},data-email=${customer.email},data-phone=${customer.phoneNumber}"
+                                        onclick="openEditModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-email'), this.getAttribute('data-phone'))">Edit</button>
+                                <!-- Only Admin and Manager can change customer status -->
+                                <button class="action-btn status"
+                                        th:if="${session.role != null && (session.role.equalsIgnoreCase('admin') || session.role.equalsIgnoreCase('manager'))}"
+                                        th:attr="data-id=${customer.id},data-status=${customer.status != null ? customer.status : 'active'}"
+                                        onclick="openStatusModal(this.getAttribute('data-id'), this.getAttribute('data-status'))">Status</button>
+                                <!-- Only Admin can delete customers -->
+                                <button class="action-btn delete"
+                                        th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}"
+                                        th:attr="data-id=${customer.id}"
+                                        onclick="deleteCustomer(this.getAttribute('data-id'))">Delete</button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(customers)}">
+                            <td colspan="7" style="text-align: center; padding: 40px;">No customers found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Show access denied message for unauthorized roles (not Admin, Manager) -->
+        <main class="main-content" th:unless="${session.role != null and (session.role.equalsIgnoreCase('admin') or session.role.equalsIgnoreCase('manager'))}">
+            <div class="page-header">
+                <h1>🚫 Access Denied</h1>
+            </div>
+            <div class="alert alert-error">
+                <p>You do not have permission to manage customers.</p>
+                <p>Only <strong>Admin</strong> and <strong>Manager</strong> can access this section.</p>
+            </div>
+            <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </main>
+    </div>
+
+    <!-- Status Modal -->
+    <div id="statusModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Update Customer Status</h3>
+            <form id="statusForm" method="post">
+                <div class="form-group">
+                    <label>Select Status:</label>
+                    <select id="newStatus" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Edit Customer</h3>
+            <form id="editForm" method="post">
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="editFullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="text" id="editPhone" name="phoneNumber" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function viewCustomer(id) {
+            // Redirect to customer details page (if available) or show alert
+            alert('Customer ID: ' + id);
+        }
+        function openStatusModal(customerId, currentStatus) {
+            document.getElementById('statusModal').style.display = 'flex';
+            document.getElementById('statusForm').action = '/admin/customers/' + customerId + '/status';
+            document.getElementById('newStatus').value = currentStatus;
+        }
+        function closeModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+        function openEditModal(id, fullName, email, phone) {
+            document.getElementById('editModal').style.display = 'flex';
+            document.getElementById('editForm').action = '/admin/customers/' + id + '/update';
+            document.getElementById('editFullName').value = fullName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        function deleteCustomer(id) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                fetch('/admin/customers/' + id + '/delete', { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Failed to delete customer');
+                        }
+                    });
+            }
+        }
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+

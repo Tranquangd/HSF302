@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar using fragment -->
+        <aside th:replace="~{admin/fragments/sidebar :: sidebar('rooms')}"></aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>🛏️ Room Management</h1>
+                <!-- Only Admin can add rooms -->
+                <a href="/admin/rooms/create" th:if="${session.role != null and session.role.equalsIgnoreCase('admin')}" class="btn btn-primary">➕ Add Room</a>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success"><span th:text="${success}"></span></div>
+            <div th:if="${error}" class="alert alert-error"><span th:text="${error}"></span></div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Room Number</th>
+                            <th>Type</th>
+                            <th>Price/Night</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="room : ${rooms}">
+                            <td th:text="${room.id}">1</td>
+                            <td><strong th:text="${room.roomNumber}">101</strong></td>
+                            <td th:text="${room.roomType}">Standard</td>
+                            <td th:text="'$' + ${room.pricePerNight}">$100</td>
+                            <td th:text="${room.capacity}">2</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${room.available ? 'status-active' : 'status-inactive'}"
+                                      th:text="${room.available ? 'Available' : 'Unavailable'}">Available</span>
+                            </td>
+                            <td class="action-btns">
+                                <a th:href="@{/admin/rooms/{id}/view(id=${room.id})}" class="action-btn view">View</a>
+                                <a th:href="@{/admin/rooms/edit/{id}(id=${room.id})}" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}" class="action-btn edit">Edit</a>
+                                <button class="action-btn status" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}" th:onclick="'toggleRoomStatus(' + ${room.id} + ', ' + ${room.available} + ')'">Toggle</button>
+                                <button class="action-btn delete" th:if="${session.role != null && session.role.equalsIgnoreCase('admin')}" th:onclick="'deleteRoom(' + ${room.id} + ')'">Delete</button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(rooms)}">
+                            <td colspan="7" style="text-align: center; padding: 40px;">No rooms found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleRoomStatus(id, currentStatus) {
+            if (confirm('Change room status to ' + (currentStatus ? 'Unavailable' : 'Available') + '?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/rooms/' + id + '/status';
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'available';
+                input.value = !currentStatus;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function deleteRoom(id) {
+            if (confirm('Are you sure you want to delete this room?')) {
+                fetch('/admin/rooms/' + id + '/delete', { method: 'POST' })
+                    .then(response => { location.reload(); });
+            }
+        }
+    </script>
+</body>
+</html>
+

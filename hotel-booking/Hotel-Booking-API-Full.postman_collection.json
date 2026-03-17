@@ -1,0 +1,1267 @@
+{
+	"info": {
+		"_postman_id": "hotel-booking-api-collection",
+		"name": "Hotel Booking API - Full Collection",
+		"description": "Complete API collection for Hotel Booking System with JWT Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Login - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"    pm.test('Login successful', function() {",
+									"        pm.expect(jsonData.role).to.eql('admin');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"admin\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"manager1\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"staff1\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"customer1\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "me"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👑 Admin APIs",
+			"item": [
+				{
+					"name": "Dashboard",
+					"item": [
+						{
+							"name": "Get Admin Dashboard",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/dashboard",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "dashboard"]
+								}
+							}
+						},
+						{
+							"name": "Get Reports",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/reports",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "reports"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "User Management",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users"]
+								}
+							}
+						},
+						{
+							"name": "Get User by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/manager1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users", "manager1"]
+								}
+							}
+						},
+						{
+							"name": "Get Users by Role",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/role/manager",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users", "role", "manager"]
+								}
+							}
+						},
+						{
+							"name": "Create Manager",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": \"manager2\",\n    \"password\": \"123456\",\n    \"username\": \"Nguyen Van Manager 2\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/manager",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users", "manager"]
+								}
+							}
+						},
+						{
+							"name": "Update User Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"inactive\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/manager1/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users", "manager1", "status"]
+								}
+							}
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/manager2",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "users", "manager2"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Room Management",
+					"item": [
+						{
+							"name": "Get All Rooms",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms"]
+								}
+							}
+						},
+						{
+							"name": "Get Room by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms", "1"]
+								}
+							}
+						},
+						{
+							"name": "Create Room",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"roomNumber\": \"601\",\n    \"roomType\": \"VIP\",\n    \"pricePerNight\": 2000000,\n    \"capacity\": 4,\n    \"description\": \"VIP Room with ocean view\",\n    \"available\": true,\n    \"imageUrl\": \"/images/rooms/vip.jpg\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms"]
+								}
+							}
+						},
+						{
+							"name": "Update Room",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"roomType\": \"Deluxe Plus\",\n    \"pricePerNight\": 900000,\n    \"description\": \"Updated Deluxe Room with balcony\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms/4",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms", "4"]
+								}
+							}
+						},
+						{
+							"name": "Update Room Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"available\": false\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms/1/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms", "1", "status"]
+								}
+							}
+						},
+						{
+							"name": "Delete Room",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/rooms/11",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "rooms", "11"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Booking Management",
+					"item": [
+						{
+							"name": "Get All Bookings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings"]
+								}
+							}
+						},
+						{
+							"name": "Get Booking by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings", "1"]
+								}
+							}
+						},
+						{
+							"name": "Create Booking",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"roomId\": 3,\n    \"checkInDate\": \"2026-03-20\",\n    \"checkOutDate\": \"2026-03-25\",\n    \"numberOfGuests\": 2,\n    \"customerInfo\": {\n        \"fullName\": \"Tran Van Test\",\n        \"email\": \"tranvantest@gmail.com\",\n        \"phoneNumber\": \"0987654321\"\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings"]
+								}
+							}
+						},
+						{
+							"name": "Update Booking",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"checkInDate\": \"2026-03-21\",\n    \"checkOutDate\": \"2026-03-26\",\n    \"numberOfGuests\": 3\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings", "1"]
+								}
+							}
+						},
+						{
+							"name": "Update Booking Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"CONFIRMED\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings/3/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings", "3", "status"]
+								}
+							}
+						},
+						{
+							"name": "Delete Booking",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/bookings/6",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "bookings", "6"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "👔 Manager APIs",
+			"item": [
+				{
+					"name": "Dashboard",
+					"item": [
+						{
+							"name": "Get Manager Dashboard",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/dashboard",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "dashboard"]
+								}
+							}
+						},
+						{
+							"name": "Get Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/statistics",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "statistics"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Booking Management",
+					"item": [
+						{
+							"name": "Get All Bookings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings"]
+								}
+							}
+						},
+						{
+							"name": "Get Booking by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings", "1"]
+								}
+							}
+						},
+						{
+							"name": "Create Booking",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"roomId\": 5,\n    \"checkInDate\": \"2026-04-01\",\n    \"checkOutDate\": \"2026-04-05\",\n    \"numberOfGuests\": 2,\n    \"customerInfo\": {\n        \"fullName\": \"Le Thi Manager Test\",\n        \"email\": \"lethitest@gmail.com\",\n        \"phoneNumber\": \"0912345678\"\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings"]
+								}
+							}
+						},
+						{
+							"name": "Update Booking",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"numberOfGuests\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings/2",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings", "2"]
+								}
+							}
+						},
+						{
+							"name": "Update Booking Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"CHECKED_IN\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings/1/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings", "1", "status"]
+								}
+							}
+						},
+						{
+							"name": "Delete Booking",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/bookings/7",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "bookings", "7"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Customer Management",
+					"item": [
+						{
+							"name": "Get All Customers",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "customers"]
+								}
+							}
+						},
+						{
+							"name": "Get Customer by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/customers/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "customers", "1"]
+								}
+							}
+						},
+						{
+							"name": "Update Customer",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fullName\": \"Nguyen Van An Updated\",\n    \"phoneNumber\": \"0999888777\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/manager/customers/1",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "manager", "customers", "1"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "👷 Staff APIs",
+			"item": [
+				{
+					"name": "Get Staff Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Check-in Guest",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/check-in/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "check-in", "1"]
+						}
+					}
+				},
+				{
+					"name": "Check-out Guest",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/check-out/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "check-out", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Today Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/today-bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "today-bookings"]
+						}
+					}
+				},
+				{
+					"name": "Get Room Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/room-status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "room-status"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏨 Public Booking APIs",
+			"item": [
+				{
+					"name": "Search Available Rooms",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"checkInDate\": \"2026-03-01\",\n    \"checkOutDate\": \"2026-03-05\",\n    \"numberOfGuests\": 2,\n    \"roomType\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/search-rooms",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "search-rooms"]
+						}
+					}
+				},
+				{
+					"name": "Search Rooms - Deluxe Only",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"checkInDate\": \"2026-03-01\",\n    \"checkOutDate\": \"2026-03-05\",\n    \"numberOfGuests\": 3,\n    \"roomType\": \"Deluxe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/search-rooms",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "search-rooms"]
+						}
+					}
+				},
+				{
+					"name": "Create Booking (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roomId\": 1,\n    \"checkInDate\": \"2026-04-10\",\n    \"checkOutDate\": \"2026-04-15\",\n    \"numberOfGuests\": 2,\n    \"customerInfo\": {\n        \"fullName\": \"Khach Hang Moi\",\n        \"email\": \"khachhangmoi@gmail.com\",\n        \"phoneNumber\": \"0901234567\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings"]
+						}
+					}
+				},
+				{
+					"name": "Get Booking by ID (Auth Required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💳 Payment APIs",
+			"item": [
+				{
+					"name": "Process Payment - Credit Card",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookingId\": 3,\n    \"paymentMethod\": \"CREDIT_CARD\",\n    \"cardNumber\": \"4111111111111111\",\n    \"cardHolderName\": \"NGUYEN VAN A\",\n    \"expiryDate\": \"12/28\",\n    \"cvv\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "process"]
+						}
+					}
+				},
+				{
+					"name": "Process Payment - Cash (Auto Success)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookingId\": 4,\n    \"paymentMethod\": \"CASH\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "process"]
+						}
+					}
+				},
+				{
+					"name": "Process Payment - VNPay",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookingId\": 3,\n    \"paymentMethod\": \"VNPAY\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "process"]
+						},
+						"description": "Returns VNPay redirect URL. Use browser to complete payment."
+					}
+				},
+				{
+					"name": "Get Payment by Booking ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/booking/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "booking", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🧪 Test Authorization",
+			"item": [
+				{
+					"name": "Test - Admin Access Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "users"]
+						},
+						"description": "Should return 403 if not logged in as Admin"
+					}
+				},
+				{
+					"name": "Test - Manager Access",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/manager/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "manager", "bookings"]
+						},
+						"description": "Should work for Admin and Manager"
+					}
+				},
+				{
+					"name": "Test - Staff Access",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "dashboard"]
+						},
+						"description": "Should work for Admin, Manager, and Staff"
+					}
+				},
+				{
+					"name": "Test - No Token (401)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "users"]
+						},
+						"description": "Should return 401 Unauthorized"
+					}
+				},
+				{
+					"name": "Test - Invalid Token (401)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer invalid_token_here"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "users"]
+						},
+						"description": "Should return 401 Unauthorized"
+					}
+				}
+			]
+		}
+	]
+}
+
