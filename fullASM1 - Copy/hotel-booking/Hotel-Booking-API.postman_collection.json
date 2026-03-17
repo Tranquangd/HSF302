@@ -1,0 +1,139 @@
+{
+	"info": {
+		"name": "Hotel Booking API",
+		"description": "API collection for hotel room booking workflows",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Workflow 1: Room Search & Booking",
+			"item": [
+				{
+					"name": "1. Search Available Rooms",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"checkInDate\": \"2026-02-01\",\n  \"checkOutDate\": \"2026-02-05\",\n  \"numberOfGuests\": 2,\n  \"roomType\": \"Double\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/bookings/search-rooms",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bookings", "search-rooms"]
+						}
+					}
+				},
+				{
+					"name": "2. Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomId\": 2,\n  \"checkInDate\": \"2026-02-01\",\n  \"checkOutDate\": \"2026-02-05\",\n  \"numberOfGuests\": 2,\n  \"customerInfo\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phoneNumber\": \"1234567890\"\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/bookings",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bookings"]
+						}
+					}
+				},
+				{
+					"name": "3. Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bookings/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bookings", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workflow 2: Payment & Confirmation",
+			"item": [
+				{
+					"name": "1. Process Payment (Success)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": 1,\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardNumber\": \"4111111111111111\",\n  \"cardHolderName\": \"John Doe\",\n  \"expiryDate\": \"12/28\",\n  \"cvv\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/payments/process",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "payments", "process"]
+						}
+					}
+				},
+				{
+					"name": "2. Process Payment (Random)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": 1,\n  \"paymentMethod\": \"DEBIT_CARD\",\n  \"cardNumber\": \"5555555555554444\",\n  \"cardHolderName\": \"Jane Smith\",\n  \"expiryDate\": \"06/27\",\n  \"cvv\": \"456\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/payments/process",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "payments", "process"]
+						}
+					}
+				},
+				{
+					"name": "3. Get Payment by Booking ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/payments/booking/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "payments", "booking", "1"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

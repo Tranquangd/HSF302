@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Booking - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <style>
+        /* Taskbar styling */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            width: 100%; /* Ensure taskbar spans the full width */
+        }
+
+        .header-content .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-content .logo .logo-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .header-content nav {
+            display: flex;
+            flex-wrap: wrap; /* Ensure links adjust for smaller screens */
+        }
+
+        .header-content nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .header-content nav a:hover {
+            color: #ffcc00;
+        }
+
+        /* Ensure the page stretches to fit the window */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Ensure container spans the full width */
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <a th:href="@{/}" class="logo">
+                    <span class="logo-icon">🏨</span>
+                    <span class="logo-text">
+                        <span class="logo-title">Hotel Booking</span>
+                        <span class="logo-subtitle">Smart Reservation System</span>
+                    </span>
+                </a>
+
+                <nav>
+                    <a th:href="@{/}">Home</a>
+                    <a th:href="@{/bookings/search}">Search Rooms</a>
+                    <span th:if="${session.user}" style="margin: 0 15px; color: #fff;">
+                        👤 <strong th:text="${session.username}"></strong>
+                        <span class="badge" th:classappend="${session.role == 'admin' ? 'badge-error' : (session.role == 'manager' ? 'badge-warning' : 'badge-success')}" 
+                              th:text="${session.role}" style="margin-left: 5px;"></span>
+                    </span>
+                    <a th:if="${session.user}" th:href="@{/logout}">Logout</a>
+                    <a th:unless="${session.user}" th:href="@{/login}">Login</a>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="form-container">
+                <h2>Complete Your Booking</h2>
+                
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div class="booking-summary">
+                    <h3>Booking Details</h3>
+                    <p><strong>Check-in:</strong> <span th:text="${bookingRequest.checkInDate}"></span></p>
+                    <p><strong>Check-out:</strong> <span th:text="${bookingRequest.checkOutDate}"></span></p>
+                    <p><strong>Guests:</strong> <span th:text="${bookingRequest.numberOfGuests}"></span></p>
+                </div>
+                
+                <form th:action="@{/bookings/create}" th:object="${bookingRequest}" method="post">
+                    <input type="hidden" th:field="*{roomId}">
+                    <input type="hidden" th:field="*{checkInDate}">
+                    <input type="hidden" th:field="*{checkOutDate}">
+                    <input type="hidden" th:field="*{numberOfGuests}">
+                    
+                    <h3>Customer Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="fullName">Full Name:</label>
+                        <input type="text" id="fullName" th:field="*{customerInfo.fullName}" required>
+                        <span class="error" th:if="${#fields.hasErrors('customerInfo.fullName')}" th:errors="*{customerInfo.fullName}"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" th:field="*{customerInfo.email}" required>
+                        <span class="error" th:if="${#fields.hasErrors('customerInfo.email')}" th:errors="*{customerInfo.email}"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="tel" id="phoneNumber" th:field="*{customerInfo.phoneNumber}" 
+                               pattern="[0-9]{10,15}" placeholder="1234567890" required>
+                        <span class="error" th:if="${#fields.hasErrors('customerInfo.phoneNumber')}" th:errors="*{customerInfo.phoneNumber}"></span>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">✅ Create Booking</button>
+                        <a th:href="@{/bookings/search}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Hotel Booking</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <style>
+        /* Taskbar styling */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            width: 100%; /* Ensure taskbar spans the full width */
+        }
+
+        .header-content .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-content .logo .logo-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .header-content nav {
+            display: flex;
+            flex-wrap: wrap; /* Ensure links adjust for smaller screens */
+        }
+
+        .header-content nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .header-content nav a:hover {
+            color: #ffcc00;
+        }
+
+        /* Ensure the page stretches to fit the window */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Ensure container spans the full width */
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Hotel Booking System</h1>
+            <nav>
+                <a th:href="@{/}">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="error-container">
+                <div class="error-icon">❌</div>
+                <h2>Oops! Something went wrong</h2>
+                
+                <div class="alert alert-error" th:if="${error}">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div class="alert alert-error" th:unless="${error}">
+                    <span>An unexpected error occurred. Please try again later.</span>
+                </div>
+                
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
+                    <a th:href="@{/bookings/search}" class="btn btn-secondary">Search Rooms</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System</p>
+        </footer>
+    </div>
+</body>
+</html>

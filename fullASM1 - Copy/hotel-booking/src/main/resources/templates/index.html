@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking System</title>
+    <link rel="stylesheet" th:href="@{/css/hotel-booking.css}">
+    <style>
+        /* Taskbar styling */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            width: 100%; /* Ensure taskbar spans the full width */
+        }
+
+        .header-content .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-content .logo .logo-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .header-content nav {
+            display: flex;
+            flex-wrap: wrap; /* Ensure links adjust for smaller screens */
+        }
+
+        .header-content nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .header-content nav a:hover {
+            color: #ffcc00;
+        }
+
+        /* Ensure the page stretches to fit the window */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Ensure container spans the full width */
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <a th:href="@{/}" class="logo">
+                    <span class="logo-icon">🏨</span>
+                    <span class="logo-text">
+                        <span class="logo-title">Hotel Booking</span>
+                        <span class="logo-subtitle">Smart Reservation System</span>
+                    </span>
+                </a>
+
+                <nav>
+                    <a th:href="@{/}">Home</a>
+                    <a th:href="@{/bookings/search}">Search Rooms</a>
+                    <span th:if="${session.user}" style="margin: 0 15px; color: #fff;">
+                        👤 <strong th:text="${session.username}"></strong>
+                        <span class="badge" th:classappend="${session.role == 'admin' ? 'badge-error' : (session.role == 'manager' ? 'badge-warning' : 'badge-success')}" 
+                              th:text="${session.role}" style="margin-left: 5px;"></span>
+                    </span>
+                    <a th:if="${session.user}" th:href="@{/logout}">Logout</a>
+                    <a th:unless="${session.user}" th:href="@{/login}">Login</a>
+                </nav>
+            </div>
+        </header>
+        
+        <div class="hero">
+            <div class="hero-content">
+                <h2>Find Your Perfect Room</h2>
+                <p>Search and book hotel rooms with ease</p>
+                
+                <div class="action-buttons">
+                    <a th:href="@{/bookings/search}" class="btn btn-primary btn-large">
+                        🔍 Search Available Rooms
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <main>
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}"></span>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h3>🛏️ Wide Selection</h3>
+                    <p>Choose from Single, Double, Suite, and Family rooms</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💳 Easy Payment</h3>
+                    <p>Multiple payment methods supported</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Instant Confirmation</h3>
+                    <p>Get booking confirmation immediately</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Hotel Booking System. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
